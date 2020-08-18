@@ -29,8 +29,8 @@ public class Client : MonoBehaviour
         }
         else if (instance != this)
         {
-            Debug.Log("Instance already exists! Destroying object!");
-            Destroy(this);
+            //Debug.Log("Instance already exists! Destroying object!");
+            Destroy(transform.root.gameObject);
         }
     }
 
@@ -41,7 +41,7 @@ public class Client : MonoBehaviour
 
     public void ClientJoinSetupIP()
     {
-        ip = SetupData.instance.serverIP;
+        ip = NetworkSetupData.instance.serverIP;
     }
 
     public void ConnectToServer()

@@ -134,11 +134,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8368283134348902524}
+  - component: {fileID: -3630433363107977329}
   - component: {fileID: 8368283134348902525}
   - component: {fileID: 8368283134348902522}
   - component: {fileID: 8368283134348902523}
   m_Layer: 0
-  m_Name: HostPlayer
+  m_Name: ServersideHostPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -160,6 +161,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-3630433363107977329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8368283134348902526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7186d98341f40a541ac84649002680c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  username: 
+  movementController: {fileID: 8368283134348902522}
 --- !u!114 &8368283134348902525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,6 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 781269c55b6c309418dc9879b351c3ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: -3630433363107977329}
   moveSpeed: 8
   gravity: -14
   jumpHeight: 2

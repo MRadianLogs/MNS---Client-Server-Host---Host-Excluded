@@ -4,11 +4,26 @@ using UnityEngine.UI;
 
 public class HostPauseMenuController : MonoBehaviour
 {
+    public static HostPauseMenuController instance;
+
     private bool isPaused = false;
     [SerializeField] private GameObject pauseMenuPanel = null;
     [SerializeField] private GameObject multiplayerMenuPanel = null;
-    private bool multiplayerEnabled = false;
+    //private bool multiplayerEnabled = false;
     [SerializeField] private Text serverStatusText = null;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Debug.Log("Instance already exists! Destroying object!");
+            Destroy(transform.root.gameObject);
+        }
+    }
 
     private void Update()
     {
@@ -57,6 +72,10 @@ public class HostPauseMenuController : MonoBehaviour
 
     public void QuitToMenu()
     {
+        if(NetworkManager.instance.serverActive)
+        {
+            NetworkManager.instance.StopServer();
+        }
         SceneManager.LoadScene("MainMenuScene");
     }
     #endregion
@@ -66,8 +85,9 @@ public class HostPauseMenuController : MonoBehaviour
     {
         //Turn on server.
         Debug.Log("Activating Server...");
-        multiplayerEnabled = true;
+        //multiplayerEnabled = true;
         serverStatusText.text = "Enabled";
+        NetworkManager.instance.StartServer(1);
     }
 
     public void GoToPauseMenu()

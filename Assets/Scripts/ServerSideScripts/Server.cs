@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
-public class Server : MonoBehaviour
+public class Server
 {
     public static int portNum { get; private set; } //The port number the server will use for connections.
 
@@ -13,7 +12,8 @@ public class Server : MonoBehaviour
     private static UdpClient udpServerClient;
 
     public static int maxNumPlayers { get; private set; }
-    public static Dictionary<int, ServerClient> clients = new Dictionary<int, ServerClient>();
+    public static Dictionary<int, ServerClient> clients;
+    
 
     public delegate void PacketHandler(int clientOrigin, Packet packet); //A data type that represents/references a method that handles a packet, and keeps track of what client sent the packet.
     public static Dictionary<int, PacketHandler> packetHandlers; //A list of packet handlers, each of which handles a specific packet type, stored with an int identifier.
@@ -40,7 +40,7 @@ public class Server : MonoBehaviour
         udpServerClient.BeginReceive(UDPReceiveCallback, null);
 
         Debug.Log($"Server started on port: {portNum}.");
-
+        NetworkManager.instance.serverActive = true;
     }
 
     /// <summary>
@@ -50,6 +50,8 @@ public class Server : MonoBehaviour
     {
         tcpListener.Stop();
         udpServerClient.Close();
+
+        Debug.Log("Server stopped.");
     }
 
     /// <summary>
@@ -64,12 +66,17 @@ public class Server : MonoBehaviour
 
         Debug.Log($"Incoming connection from {newClient.Client.RemoteEndPoint}...");
 
-        for (int i = 1; i <= maxNumPlayers; i++) //Go through list of clients to find open spot.
+        //TODO: Consider making new connections per request, instead of ahead of time. This may save the time of having to loop through all connections.
+        for (int i = 2; i <= maxNumPlayers; i++) //Go through list of clients to find open spot.
         {
-            if (clients[i].tcp.socket == null) //If that spot is open, 
+            TCPData clientTCPData = clients[i].GetTCPData();
+            if (clientTCPData != null)
             {
-                clients[i].tcp.Connect(newClient); //assign the new client to that client instance/spot.
-                return;
+                if (clientTCPData.socket == null) //If that spot is open, 
+                {
+                    clientTCPData.Connect(newClient); //assign the new client to that client instance/spot.
+                    return;
+                }
             }
         }
 
@@ -103,15 +110,19 @@ public class Server : MonoBehaviour
                     return;
                 }
 
-                if (clients[clientId].udp.endPoint == null) //If received data from a client that doesnt have UDP setup yet,
+                UDPData clientUDPData = clients[clientId].GetUDPData();
+                if (clientUDPData != null)
                 {
-                    clients[clientId].udp.Connect(clientEndPoint); //Setup/connect client UDP class. Allows it to send/receive UDP data.
-                    return;
-                }
+                    if (clientUDPData.endPoint == null) //If received data from a client that doesnt have UDP setup yet,
+                    {
+                        clientUDPData.Connect(clientEndPoint); //Setup/connect client UDP class. Allows it to send/receive UDP data.
+                        return;
+                    }
 
-                if (clients[clientId].udp.endPoint.ToString() == clientEndPoint.ToString()) //If the id attached to the packet, which represents who sent the packet, has the endpoint(IP address) that matches the endpoint which sent the data, handle the data.
-                {
-                    clients[clientId].udp.HandleData(packet);
+                    if (clientUDPData.endPoint.ToString() == clientEndPoint.ToString()) //If the id attached to the packet, which represents who sent the packet, has the endpoint(IP address) that matches the endpoint which sent the data, handle the data.
+                    {
+                        clientUDPData.HandleData(packet);
+                    }
                 }
             }
         }
@@ -146,16 +157,21 @@ public class Server : MonoBehaviour
     /// </summary>
     private static void InitializeServerData()
     {
-        for (int i = 1; i <= maxNumPlayers; i++)
+        clients = new Dictionary<int, ServerClient>();
+
+        // TODO: Consider doing this on a per-connection basis. When new connection recieved, add new client.
+        clients.Add(1, new ServerHostClient(1, "Temp", GameManager.serversidePlayers[1].GetComponentInChildren<Player>())); //Add in host client.
+        for (int i = 2; i <= maxNumPlayers; i++)
         {
-            clients.Add(i, new ServerClient(i));
+            clients.Add(i, new ServerJoinedClient(i, "Temp"));
         }
 
         packetHandlers = new Dictionary<int, PacketHandler>()
             {
                 { (int)ClientPackets.welcomeReceived, ServerHandle.WelcomeReceived},
                 { (int)ClientPackets.udpTestReceived, ServerHandle.UDPTestReceived},
-                { (int)ClientPackets.playerMovement, ServerHandle.PlayerMovement}
+                { (int)ClientPackets.playerMovement, ServerHandle.PlayerMovement},
+                { (int)ClientPackets.requestPlayerSpawn, ServerHandle.HandlePlayerSpawnRequest}
             };
         Debug.Log("Initialized packet handlers.");
     }

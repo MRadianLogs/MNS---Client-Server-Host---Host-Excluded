@@ -31,7 +31,7 @@ public class ClientHandle : MonoBehaviour
         Vector3 position = packet.ReadVector3();
         Quaternion rotation = packet.ReadQuaternion();
 
-        GameManager.instance.SpawnPlayer(id, username, position, rotation);
+        GameManager.instance.SpawnClientSidePlayer(id, username, position, rotation);
     }
 
     public static void PlayerPosition(Packet packet)
@@ -39,7 +39,7 @@ public class ClientHandle : MonoBehaviour
         int id = packet.ReadInt();
         Vector3 position = packet.ReadVector3();
 
-        GameManager.players[id].transform.position = position;
+        GameManager.clientsidePlayers[id].transform.position = position;
     }
 
     public static void PlayerRotation(Packet packet)
@@ -47,6 +47,6 @@ public class ClientHandle : MonoBehaviour
         int id = packet.ReadInt();
         Quaternion rotation = packet.ReadQuaternion();
 
-        GameManager.players[id].transform.rotation = rotation;
+        GameManager.clientsidePlayers[id].transform.rotation = rotation;
     }
 }

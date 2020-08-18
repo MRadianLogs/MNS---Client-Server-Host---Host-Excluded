@@ -7,14 +7,16 @@ public class ServerHandle
         int clientId = packet.ReadInt();
         string username = packet.ReadString();
 
-        Debug.Log($"{Server.clients[clientOrigin].tcp.socket.Client.RemoteEndPoint} connected and is now player {clientOrigin}.");
+        Debug.Log($"{Server.clients[clientOrigin].GetTCPData().socket.Client.RemoteEndPoint} connected and is now player {clientOrigin}.");
         if (clientOrigin != clientId)
         {
             Debug.Log($"Player \"{username}\" (ID: {clientOrigin}) has assumed the wrong client ID ({clientId})!");
         }
 
         //Send player into game.
-        Server.clients[clientOrigin].SendIntoGame(username);
+        //Debug.Log($"New client ID is: {clientId}");
+        //Debug.Log($"Sending {Server.clients[clientId]} into the game!");
+        //Server.clients[clientOrigin].SendIntoGame(username);
     }
 
     public static void UDPTestReceived(int clientOrigin, Packet packet)
@@ -34,6 +36,11 @@ public class ServerHandle
         }
         Quaternion playerRotation = packet.ReadQuaternion();
 
-        Server.clients[clientOrigin].player.SetInput(inputs, playerRotation);
+        Server.clients[clientOrigin].player.movementController.SetInputs(inputs, playerRotation);
+    }
+
+    public static void HandlePlayerSpawnRequest(int clientOrigin, Packet packet)
+    {
+        Server.clients[clientOrigin].SendPlayerIntoGame("Temp client");
     }
 }

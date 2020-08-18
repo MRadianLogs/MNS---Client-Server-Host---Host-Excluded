@@ -14,8 +14,12 @@ public class ServerSend
 
     private static void SendTCPData(int clientDest, Packet packet)
     {
-        packet.WriteLength();
-        Server.clients[clientDest].tcp.SendData(packet);
+        TCPData destClientTCPData = Server.clients[clientDest].GetTCPData();
+        if (destClientTCPData != null)
+        {
+            packet.WriteLength();
+            destClientTCPData.SendData(packet);
+        }
     }
 
     private static void SendTCPDataToAll(Packet packet)
@@ -23,7 +27,11 @@ public class ServerSend
         packet.WriteLength();
         for (int i = 1; i <= Server.maxNumPlayers; i++)
         {
-            Server.clients[i].tcp.SendData(packet);
+            TCPData destClientTCPData = Server.clients[i].GetTCPData();
+            if (destClientTCPData != null)
+            {
+                destClientTCPData.SendData(packet);
+            }
         }
     }
 
@@ -34,15 +42,23 @@ public class ServerSend
         {
             if (i != clientExceptionNum)
             {
-                Server.clients[i].tcp.SendData(packet);
+                TCPData destClientTCPData = Server.clients[i].GetTCPData();
+                if (destClientTCPData != null)
+                {
+                    destClientTCPData.SendData(packet);
+                }
             }
         }
     }
 
     private static void SendUDPData(int clientDest, Packet packet)
     {
-        packet.WriteLength();
-        Server.clients[clientDest].udp.SendData(packet);
+        UDPData destClientUDPData = Server.clients[clientDest].GetUDPData();
+        if (destClientUDPData != null)
+        {
+            packet.WriteLength();
+            destClientUDPData.SendData(packet);
+        }
     }
 
     private static void SendUDPDataToAll(Packet packet)
@@ -50,7 +66,11 @@ public class ServerSend
         packet.WriteLength();
         for (int i = 1; i <= Server.maxNumPlayers; i++)
         {
-            Server.clients[i].udp.SendData(packet);
+            UDPData destClientUDPData = Server.clients[i].GetUDPData();
+            if (destClientUDPData != null)
+            {
+                destClientUDPData.SendData(packet);
+            }
         }
     }
 
@@ -61,7 +81,11 @@ public class ServerSend
         {
             if (i != clientExceptionNum)
             {
-                Server.clients[i].udp.SendData(packet);
+                UDPData destClientUDPData = Server.clients[i].GetUDPData();
+                if (destClientUDPData != null)
+                {
+                    destClientUDPData.SendData(packet);
+                }
             }
         }
     }

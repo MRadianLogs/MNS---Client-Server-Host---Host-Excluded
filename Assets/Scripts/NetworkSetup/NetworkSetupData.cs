@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class SetupData : MonoBehaviour
+public class NetworkSetupData : MonoBehaviour
 {
-    public static SetupData instance;
+    public static NetworkSetupData instance;
 
     public int maxNumPlayersJoin { get; set; }
 
@@ -16,12 +14,11 @@ public class SetupData : MonoBehaviour
     {
         if (instance == null)
         {
-            DontDestroyOnLoad(gameObject);
             instance = this;
         }
         else if (instance != this)
         {
-            Destroy(gameObject);
+            Destroy(transform.root.gameObject);
         }
     }
 }

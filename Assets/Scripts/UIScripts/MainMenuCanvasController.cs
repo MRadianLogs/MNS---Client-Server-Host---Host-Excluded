@@ -24,6 +24,8 @@ public class MainMenuCanvasController : MonoBehaviour
     public void JoinGameButtonPressed()
     {
         //Attempt to join server with inputted IP.
+        NetworkSetupData.instance.serverIP = serverIpInputText.text;
+        SceneManager.LoadScene("MultiplayerClientJoinScene");
     }
     public void GoToStartScreenMenu()
     {

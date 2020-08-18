@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class ClientCameraController : MonoBehaviour
 {
     public PlayerManager player;
     public float sensitivity = 100f;

@@ -19,9 +19,8 @@ public class ClientSend : MonoBehaviour
         using (Packet packet = new Packet((int)ClientPackets.welcomeReceived))
         {
             packet.Write(Client.instance.clientID);
-            //packet.Write(UIManager.instance.usernameField.text);
-            packet.Write(SetupData.instance.username);
-
+            //packet.Write(NetworkSetupData.instance.username);
+            packet.Write("Temp");
             SendTCPData(packet);
         }
     }
@@ -45,9 +44,19 @@ public class ClientSend : MonoBehaviour
             {
                 packet.Write(input);
             }
-            packet.Write(GameManager.players[Client.instance.clientID].transform.rotation);
+            packet.Write(GameManager.clientsidePlayers[Client.instance.clientID].transform.rotation);
 
             SendUDPData(packet);//Dont need all of these packets to find destination, and UDP is faster.
+        }
+    }
+
+    public static void RequestPlayerSpawn()
+    {
+        using (Packet packet = new Packet((int)ClientPackets.requestPlayerSpawn))
+        {
+            packet.Write(Client.instance.clientID);
+            
+            SendTCPData(packet);
         }
     }
 }

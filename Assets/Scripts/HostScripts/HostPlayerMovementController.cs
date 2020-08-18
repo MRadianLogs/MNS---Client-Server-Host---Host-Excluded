@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 
-public class HostPlayerMovementController : MonoBehaviour
+public class HostPlayerMovementController : MovementController
 {
+    [SerializeField] private Player player = null;
     [SerializeField] private float moveSpeed = 12f;
     [SerializeField] private float gravity = -9.81f;
     [SerializeField] private float jumpHeight = 3f;
 
-    [SerializeField] private Transform playerCamera;
+    [SerializeField] private Transform playerCamera = null;
     [SerializeField] private CharacterController playerController = null;
 
     private Vector3 velocity;
@@ -22,6 +23,15 @@ public class HostPlayerMovementController : MonoBehaviour
         UpdateGravityJumpCheck();
     }
 
+    private void FixedUpdate()
+    {
+        if(NetworkManager.instance.serverActive)
+        {
+            ServerSend.PlayerPosition(player);
+            ServerSend.PlayerRotation(player);
+        }
+    }
+
     private void UpdatePlayerMovementInputsMove()
     {
         float xInput = Input.GetAxis("Horizontal");
@@ -30,6 +40,8 @@ public class HostPlayerMovementController : MonoBehaviour
         Vector3 moveDirection = (playerCamera.right * xInput) + (new Vector3(playerCamera.forward.x, 0, playerCamera.forward.z) * zInput);
 
         playerController.Move(moveDirection * moveSpeed * Time.deltaTime);
+
+        //Send position and rotation over server.
     }
     private void UpdateGravityJumpCheck()
     {
